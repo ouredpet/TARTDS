@@ -29,16 +29,19 @@ def transparency_vectorized(energy_vec, model):
     k2 = calc_k(m2, v2, energy_vec)
     k3 = calc_k(m3, v3, energy_vec)
 
-    # Build transfer matrices
-    T12 = interface_matrix(m1, k1, m2, k2)
-    P2 = propagation_matrix(k2, w2)
-    T23 = interface_matrix(m2, k2, m3, k3)
+    with np.errstate(divide='ignore', invalid='ignore'):
 
-    # Total transfer matrix: M = T12 @ P2 @ T23
-    M = np.einsum('ij...,jk...,kl...->il...', T12, P2, T23)
+        T12 = interface_matrix(m1, k1, m2, k2)
+        P2 = propagation_matrix(k2, w2)
+        T23 = interface_matrix(m2, k2, m3, k3)
 
-    # Transmission coefficient (for left incidence)
-    t = 1 / M[0, 0]
-    # Probability current correction for non-uniform mass
-    transparency = (np.abs(t)**2) * (np.real(k3 / m3) / np.real(k1 / m1))
+        M = np.einsum('ij...,jk...,kl...->il...', T12, P2, T23)
+        t = 1 / M[0, 0]
+        transparency = (np.abs(t)**2) * (np.real(k3 / m3) / np.real(k1 / m1))
+
+    # Set transparency to zero where k1 or k3 are (close to) zero
+    tol = 1e-14
+    mask = (np.real(k1) < tol) | (np.real(k3) < tol)
+    transparency[mask] = 0.0
+
     return transparency
