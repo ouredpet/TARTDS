@@ -34,10 +34,7 @@ ax.plot(energies / consts.e_c, T)
 ax.set_xlabel('Energy (eV)')
 ax.set_ylabel('Transparency')
 ax.set_title('Barrier Transparency vs Energy')
-<<<<<<< HEAD
 ax.set_yscale('log')
-=======
->>>>>>> b05ca8f (Implement physical constants and barrier transparency calculations)
 ax.grid(True)
 
 plt.show()
