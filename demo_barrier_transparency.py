@@ -17,10 +17,9 @@ class Model:
         self.reg_3 = reg_3
 
 # Example parameters
-m0 = 9.10938356e-31  # electron mass (kg)
-reg1 = Region(effective_mass=m0, potential_energy=0, width=0)
-reg2 = Region(effective_mass=m0, potential_energy=0.3*consts.e_c, width=5e-9)
-reg3 = Region(effective_mass=m0, potential_energy=0, width=0)
+reg1 = Region(effective_mass=consts.m0, potential_energy=0, width=0)
+reg2 = Region(effective_mass=consts.m0, potential_energy=0.3*consts.e_c, width=5e-9)
+reg3 = Region(effective_mass=consts.m0, potential_energy=0, width=0)
 model = Model(reg1, reg2, reg3)
 
 # Energy vector (in Joules)
@@ -35,6 +34,7 @@ ax.plot(energies / consts.e_c, T)
 ax.set_xlabel('Energy (eV)')
 ax.set_ylabel('Transparency')
 ax.set_title('Barrier Transparency vs Energy')
+ax.set_yscale('log')
 ax.grid(True)
 
 plt.show()
