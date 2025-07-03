@@ -23,7 +23,7 @@ reg3 = Region(effective_mass=consts.m0, potential_energy=0, width=0)
 model = Model(reg1, reg2, reg3)
 
 # Energy vector (in Joules)
-energies = np.linspace(0.01, 0.5, 500) * consts.e_c
+energies = np.linspace(0.0, 0.5, 5000) * consts.e_c
 
 # Calculate transparency
 T = transparency_vectorized(energies, model)
