@@ -1,5 +1,6 @@
 import numpy as np
 from physical_constants import PhysicalConstants as consts
+from modules.barrier_transparency import transparency_vectorized as transparency_func
 
 def attempt_rate_func(model, energy_state):
     """
@@ -25,20 +26,52 @@ def attempt_rate_func(model, energy_state):
     rate = velocity / (2 * model.well.width)
     return rate
 
-def current_throug_barrier_func(model, energy_state):
-    Ne = 1 # number of electrons availible from the contact (changed this, now dummy)
-    N_2D = 1 # Number of electrons in the QW (change this, now dummy)
+def current_throug_barrier_func(model, barrier_model, energy_state):
+    """
+    Calculate the current through a quantum barrier for a given energy state.
+
+    Parameters
+    ----------
+    model : object
+        Contains emitter, collector, and well properties.
+    barrier_model : object
+        Used for transparency calculation.
+    energy_state : float
+        The energy of the particle (in Joules).
+
+    Returns
+    -------
+    tuple
+        (current, energy_vector, broadening)
+    """
+    # Energy sweep for current calculation
+    energy_vector = np.linspace(0, 0.3 * consts.e_c, 5000)
+    transparency = transparency_func(energy_vector, barrier_model)
     rate = attempt_rate_func(model, energy_state)
-    energy_vector = np.linspace(0, 0.3*consts.e_c, 5000)  # Create a vector of energies from 0 to the given energy_state
-    transparency = model.barrier.transparency(energy_vector, model)
-    gamma = 0.0001*consts.e_c  # Broadening parameter (in Joules), can be adjusted based on the system
+
+    # Lorentzian broadening
+    gamma = 0.0001 * consts.e_c
     split = 3
-    dE = 0.001 * consts.e_c  # Energy step for broadening, can be adjusted based on the system
-    broadening = np.zeros_like(energy_vector, dtype=float)
+    dE = 0.001 * consts.e_c
+    broadening = np.zeros_like(energy_vector)
     for i in range(split):
-        broadening += (gamma / np.pi) / ((energy_vector - energy_state + dE*i - dE*(split/2 - 1/2))**2 + gamma**2)
-    broadening /= split  # Average the broadening over the splits
-    # current = Ne * N_2D * rate * np.trapz(transparency * broadening, energy_vector)
-    current = Ne * N_2D * rate * transparency * broadening
+        shift = dE * i - dE * (split / 2 - 0.5)
+        broadening += (gamma / np.pi) / ((energy_vector - energy_state + shift) ** 2 + gamma ** 2)
+    broadening /= split
+
+    # 2D density of states and Fermi-Dirac occupation
+    m_eff = model.emitter.reg_1.effective_mass
+    fermi = model.emitter.fermi_level
+    T = model.temperature
+    n_available = (
+        m_eff / (np.pi * consts.hbar ** 2)
+        * consts.k_B * T
+        * np.log(1 + np.exp((fermi - energy_vector) / (consts.k_B * T)))
+    )
+
+    # Current calculation
+    current = n_available * rate * transparency * broadening
+    # current = np.trapz(n_available * rate * transparency * broadening, energy_vector)
     return current, energy_vector, broadening
+
 

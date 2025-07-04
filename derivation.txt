@@ -1,0 +1,53 @@
+fermi distribution
+f = 1/(1 + exp((E - Ef)/kT))
+
+Density of states
+in the QW
+k^2 = k_x^2 + k_y^2 + k_z^2
+k^2 = 2 m (E - V)/hbar^2
+k_z^2 = 2 m (Er - V)/hbar^2
+
+2 m (E - Er)/hbar^2 = k_x^2 + k_y^2
+
+for a box
+psi = sin(n pi x/L) sin(m pi y/l)
+psi = X Y
+-hbar^2/(2me) d^2/dx^2 psi - hbar^2/(2m) d^2/dy^2 psi = E psi
+-hbar^2/(2me) Y d^2/dx^2 X - hbar^2/(2m) X d^2/dy^2 Y = E X Y
+-hbar^2/(2me) 1/X d^2/dx^2 X - hbar^2/(2m) 1/Y d^2/dy^2 Y = E
+hbar^2/(2me)(k_x^2 + k_y^2) = E
+
+1/X d^2/dx^2 X = k_x^2
+1/Y d^2/dy^2 Y = k_y^2
+
+(n pi/L)^2  = k_x^2
+(m pi/L)^2  = k_y^2
+
+(n pi/L)^2 + (m pi/L)^2 = 2 me E/hbar^2
+pi^2/L^2 (n^2 + m^2) = E (2 me)/(hbar^2)
+
+pi/L * pi/L = momentum area of one state
+
+area = pi k_r^2 = pi 2 me E/hbar^2
+only positive k_x or k_y for particle in the box with our boundary definition
+so the area is actually only for postive k_x and k_y which is 
+areaq = 1/4 area
+
+
+number of states = 2 areaq / energetic area of one state 
+(two for spin split)
+
+
+number of states = 2 (1/4 pi 2 me E/hbar^2)/(pi/L)^2
+number of states per energy and per area = me /(hbar^2*pi)
+and E>=Er
+
+Number of states in a fermi distribution
+n_e = integral_Er^inf me/(pi hbar^2) 1/(1 + exp((E - Ef)/kT)) dE
+n_e = me/(pi hbar^2) integral_Er^inf 1/(1 + exp((E - Ef)/kT)) dE
+n_e = me/(pi hbar^2) integral_Er^inf exp(-(E - Ef)/kT)/(1 + exp(-(E - Ef)/kT)) dE
+kap = 1 + exp(-(E - Ef)/kT)
+dkap/dE = -1/kT exp(-(E - Ef)/kT) 
+
+n_e = me/(pi hbar^2) integral_{1 + exp(-(Er - Ef)/kT)}^{1} -kT/kap dkap
+n_e = me/(pi hbar^2) kT ln(1 + exp((Ef - Er)/kT))
