@@ -83,6 +83,7 @@ def current_through_barrier_func(model, barrier_model, in_out = 'in', broadening
     # Current calculation
     d_current = n_available * rate * transparency * broadening
     current = consts.e_c * np.trapz(d_current, energy_vector)
+    print(np.trapz(rate * transparency * broadening, energy_vector)/1e12)
     return current, energy_vector
 
 

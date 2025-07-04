@@ -87,6 +87,7 @@ model = Model(emitter, collector, well)
 # =========================
 applied_bias_values = np.linspace(APPLIED_BIAS_START, APPLIED_BIAS_STOP, APPLIED_BIAS_POINTS)
 currents_vs_bias = []
+col_currents_vs_bias = []
 
 for applied_bias in applied_bias_values:
     potentials = bias_calc(applied_bias, N_2D)
@@ -99,17 +100,21 @@ for applied_bias in applied_bias_values:
     current_in, energy_vector = current_through_barrier_func(model, model.emitter, in_out='in', broadening_type="lorentzian")
     current_out, energy_vector = current_through_barrier_func(model, model.emitter, in_out='out', broadening_type="lorentzian")
     current = current_in - current_out
-    current = current_in
+    col_current_out, energy_vector = current_through_barrier_func(model, model.collector, in_out='out', broadening_type="lorentzian")
     currents_vs_bias.append(current)
+    col_currents_vs_bias.append(col_current_out)
 
 # =========================
 # Plot
 # =========================
 currents_vs_bias = np.array(currents_vs_bias)
+col_currents_vs_bias = np.array(col_currents_vs_bias)
 fig, ax = plt.subplots(figsize=(6, 4))
-ax.plot(applied_bias_values, currents_vs_bias * 1e3 / 1e12, marker='o')
+ax.plot(applied_bias_values, currents_vs_bias * 1e3 / 1e12, marker='o', label='Emitter')
+ax.plot(applied_bias_values, col_currents_vs_bias * 1e3 / 1e12, marker='o', label='Collector')
 ax.set_xlabel('Applied Bias (V)')
 ax.set_ylabel('Current (arb. units)')
 ax.set_title('Current Through Barrier vs Applied Bias')
 ax.grid(True)
+plt.legend()
 plt.show()
