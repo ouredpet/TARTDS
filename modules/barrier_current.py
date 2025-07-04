@@ -26,7 +26,7 @@ def attempt_rate_func(model, energy_state):
     rate = velocity / (2 * model.well.width)
     return rate
 
-def current_throug_barrier_func(model, barrier_model):
+def current_throug_barrier_func(model, barrier_model, broadening_type="lorentzian"):
     """
     Calculate the current through a quantum barrier for a given energy state.
 
@@ -36,8 +36,8 @@ def current_throug_barrier_func(model, barrier_model):
         Contains emitter, collector, and well properties.
     barrier_model : object
         Used for transparency calculation.
-    energy_state : float
-        The energy of the particle (in Joules).
+    broadening_type : str, optional
+        Type of energy broadening: "lorentzian" or "gaussian". Default is "lorentzian".
 
     Returns
     -------
@@ -52,14 +52,19 @@ def current_throug_barrier_func(model, barrier_model):
     transparency = transparency_func(energy_vector, barrier_model)
     rate = attempt_rate_func(model, energy_state)
 
-    # Lorentzian broadening
+    # Broadening
     gamma = 0.0001 * consts.e_c
     split = 3
     dE = 0.001 * consts.e_c
     broadening = np.zeros_like(energy_vector)
     for i in range(split):
         shift = dE * i - 1/2 * dE * (split - 1)
-        broadening += (gamma / np.pi) / ((energy_vector - energy_state + shift) ** 2 + gamma ** 2)
+        if broadening_type == "lorentzian":
+            broadening += (gamma / np.pi) / ((energy_vector - energy_state + shift) ** 2 + gamma ** 2)
+        elif broadening_type == "gaussian":
+            broadening += (1 / (gamma * np.sqrt(2 * np.pi))) * np.exp(-((energy_vector - energy_state + shift) ** 2) / (2 * gamma ** 2))
+        else:
+            raise ValueError("broadening_type must be 'lorentzian' or 'gaussian'")
     broadening /= split
 
     # 2D density of states and Fermi-Dirac occupation
@@ -75,6 +80,6 @@ def current_throug_barrier_func(model, barrier_model):
     # Current calculation
     current = n_available * rate * transparency * broadening
     # current = np.trapz(n_available * rate * transparency * broadening, energy_vector)
-    return current, energy_vector, transparency
+    return current, energy_vector, broadening
 
 

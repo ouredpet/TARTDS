@@ -84,7 +84,7 @@ for applied_bias in applied_bias_values:
     well.state_shift = potentials["state_shift"] 
     col_barrier.potential_energy = potentials["col_barrier"]
     col_reg3.potential_energy = potentials["col_reg3"]
-    currents, energy_vector, broadening = current_throug_barrier_func(model, model.emitter)
+    currents, energy_vector, broadening = current_throug_barrier_func(model, model.emitter, broadening_type="gaussian")
     results.append(Result(applied_bias, energy_vector, currents, broadening))
 
 # Plot all results for current

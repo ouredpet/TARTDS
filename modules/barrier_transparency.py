@@ -25,8 +25,17 @@ def transparency_vectorized(energy_vec, model):
     numerator = 2 * k1 * k2 * m2**2 * exp_minus_k1_width
     denominator = ((k1 * m2 + k2 * m1) * (k3 * m2 + k2 * m3) * exp_k2_width
                    - (k1 * m2 - k2 * m1) * (k3 * m2 - k2 * m3) * exp_minus_k2_width)
-    t_amp = numerator / denominator
 
-    transparency = (k3 * m1) / (k1 * m3) * np.abs(t_amp)**2
+    with np.errstate(divide='ignore', invalid='ignore'):
+        t_amp = numerator / denominator
+        transparency = np.real((k3 * m1) / (k1 * m3) * np.abs(t_amp)**2)
+
+    # Set transparency to zero where k1 is zero (or very close to zero)
+    tol = 1e-14
+    mask = np.abs(k1) < tol
+    transparency[mask] = 0.0
+
+    # Ensure transparency is real-valued
+    transparency = np.real(transparency)
 
     return transparency
