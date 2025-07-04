@@ -26,7 +26,7 @@ def attempt_rate_func(model, energy_state):
     rate = velocity / (2 * model.well.width)
     return rate
 
-def current_throug_barrier_func(model, barrier_model, broadening_type="lorentzian"):
+def current_through_barrier_func(model, barrier_model, in_out = 'in', broadening_type="lorentzian"):
     """
     Calculate the current through a quantum barrier for a given energy state.
 
@@ -68,18 +68,21 @@ def current_throug_barrier_func(model, barrier_model, broadening_type="lorentzia
     broadening /= split
 
     # 2D density of states and Fermi-Dirac occupation
-    m_eff = model.emitter.reg_1.effective_mass
+    m_eff = 0.041 * model.emitter.reg_1.effective_mass
     fermi = model.emitter.fermi_level
     T = model.temperature
-    n_available = (
-        m_eff / (np.pi * consts.hbar ** 2)
-        * consts.k_B * T
-        * np.log(1 + np.exp((fermi - energy_vector) / (consts.k_B * T)))
-    )
+    if in_out == 'in':
+        n_available = (
+            m_eff / (np.pi * consts.hbar ** 2)
+            * consts.k_B * T
+            * np.log(1 + np.exp((fermi - energy_vector) / (consts.k_B * T)))
+        )
+    elif in_out == 'out':
+        n_available = model.well.n_2D
 
     # Current calculation
-    current = n_available * rate * transparency * broadening
-    # current = np.trapz(n_available * rate * transparency * broadening, energy_vector)
-    return current, energy_vector, broadening
+    d_current = n_available * rate * transparency * broadening
+    current = np.trapz(d_current, energy_vector)
+    return d_current, energy_vector
 
 

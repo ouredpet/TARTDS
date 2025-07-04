@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from modules.barrier_current import current_throug_barrier_func
+from modules.barrier_current import current_through_barrier_func
 from modules.barrier_transparency import transparency_vectorized
 from physical_constants import PhysicalConstants as consts
 from modules.bias import bias_calc
@@ -26,12 +26,13 @@ class Collector:
         self.fermi_level = fermi_level
 
 class Well:
-    def __init__(self, effective_mass, width):
+    def __init__(self, effective_mass, width, n_2D):
         self.effective_mass = effective_mass
         self.ground_state = 0.1 * consts.e_c  # Example value
         self.excited_state = 0.6 * consts.e_c  # Example value
         self.state_shift = 0.0 * consts.e_c  # Example value
         self.width = width
+        self.n_2D = n_2D
 
 class Model:
     temperature = 300  # Default temperature in Kelvin
@@ -42,7 +43,7 @@ class Model:
 
 # Initial bias values for region potentials
 applied_bias = 0
-n_2D = 1e12  # Example value
+n_2D = 1e16  # Example value
 init_potentials = bias_calc(applied_bias, n_2D)
 
 # Define regions using initial potentials
@@ -58,21 +59,19 @@ col_reg3 = Region(effective_mass=consts.m0, potential_energy=init_potentials["co
 
 collector = Collector(col_reg1, col_barrier, col_reg3, fermi_level=0.1*consts.e_c)
 
-well = Well(effective_mass=consts.m0, width=10e-9)
+well = Well(effective_mass=consts.m0, width=10e-9, n_2D=n_2D)
 model = Model(emitter, collector, well)
 
 # Sweep energy_state (in Joules)
-currents, energy_vector, broadening = current_throug_barrier_func(model, model.emitter)
+currents, energy_vector = current_through_barrier_func(model, model.emitter, in_out='in')
 
 applied_bias_values = np.linspace(-0.5, 0.5, 10)  # Example sweep
-n_2D = 1e12  # Example value
 
 class Result:
-    def __init__(self, bias, energy_vector, currents, broadening):
+    def __init__(self, bias, energy_vector, currents):
         self.bias = bias
         self.energy_vector = energy_vector
         self.currents = currents
-        self.broadening = broadening
 
 results = []
 
@@ -84,8 +83,9 @@ for applied_bias in applied_bias_values:
     well.state_shift = potentials["state_shift"] 
     col_barrier.potential_energy = potentials["col_barrier"]
     col_reg3.potential_energy = potentials["col_reg3"]
-    currents, energy_vector, broadening = current_throug_barrier_func(model, model.emitter, broadening_type="gaussian")
-    results.append(Result(applied_bias, energy_vector, currents, broadening))
+    currents, energy_vector = current_through_barrier_func(model, model.emitter, in_out='in', broadening_type="gaussian")
+    # currents, energy_vector = current_through_barrier_func(model, model.emitter, in_out='out', broadening_type="gaussian")
+    results.append(Result(applied_bias, energy_vector, currents))
 
 # Plot all results for current
 fig, ax = plt.subplots(figsize=(6, 4))
@@ -99,14 +99,14 @@ ax.grid(True)
 ax.legend()
 
 # Plot all results for broadening
-fig, ax = plt.subplots(figsize=(6, 4))
-for result in results:
-    ax.plot(result.energy_vector / consts.e_c, result.broadening, label=f'V={result.bias:.2f} V')
-ax.set_xlabel('Energy (eV)')
-ax.set_ylabel('Broadening (arb. units)')
-ax.set_title('Broadening vs Energy')
-ax.set_yscale('log')
-ax.grid(True)
-ax.legend()
+# fig, ax = plt.subplots(figsize=(6, 4))
+# for result in results:
+#     ax.plot(result.energy_vector / consts.e_c, result.broadening, label=f'V={result.bias:.2f} V')
+# ax.set_xlabel('Energy (eV)')
+# ax.set_ylabel('Broadening (arb. units)')
+# ax.set_title('Broadening vs Energy')
+# ax.set_yscale('log')
+# ax.grid(True)
+# ax.legend()
 
 plt.show()
