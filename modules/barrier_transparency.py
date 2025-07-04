@@ -21,9 +21,9 @@ def propagation_matrix(k, width):
 
 def transparency_vectorized(energy_vec, model):
     energy_vec = energy_vec.astype(complex)
-    m1, m2, m3 = model.reg_1.effective_mass, model.reg_2.effective_mass, model.reg_3.effective_mass
-    v1, v2, v3 = model.reg_1.potential_energy, model.reg_2.potential_energy, model.reg_3.potential_energy
-    w1, w2, w3 = model.reg_1.width, model.reg_2.width, model.reg_3.width
+    m1, m2, m3 = model.reg_1.effective_mass, model.barrier.effective_mass, model.reg_3.effective_mass
+    v1, v2, v3 = model.reg_1.potential_energy, model.barrier.potential_energy, model.reg_3.potential_energy
+    w1, w2, w3 = model.reg_1.width, model.barrier.width, model.reg_3.width
 
     k1 = calc_k(m1, v1, energy_vec)
     k2 = calc_k(m2, v2, energy_vec)
