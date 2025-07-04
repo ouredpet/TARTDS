@@ -11,12 +11,12 @@ from modules.bias import bias_calc
 EFFECTIVE_MASS = 0.041 * consts.m0
 WELL_WIDTH = 3e-9
 BARRIER_WIDTH = 1e-9
-FERMI_LEVEL_EMITTER = (0.15 + 0.1) * consts.e_c
+FERMI_LEVEL_EMITTER = (0.16 + 0.1) * consts.e_c # here +0.1 because of the emitter step, it is also hidden in the bias calculations
 FERMI_LEVEL_COLLECTOR = 0.1 * consts.e_c
-GROUND_STATE = 0.3 * consts.e_c
+GROUND_STATE = 0.28 * consts.e_c
 EXCITED_STATE = 0.6 * consts.e_c
 STATE_SHIFT = 0.0 * consts.e_c
-N_2D = 1e15
+N_2D = 1e16
 TEMPERATURE = 300
 APPLIED_BIAS_START = 0.0
 APPLIED_BIAS_STOP = 3.0
@@ -96,7 +96,10 @@ for applied_bias in applied_bias_values:
     well.state_shift = potentials["state_shift"] 
     col_barrier.potential_energy = potentials["col_barrier"]
     col_reg3.potential_energy = potentials["col_reg3"]
-    current, energy_vector = current_through_barrier_func(model, model.emitter, in_out='in', broadening_type="lorentzian")
+    current_in, energy_vector = current_through_barrier_func(model, model.emitter, in_out='in', broadening_type="lorentzian")
+    current_out, energy_vector = current_through_barrier_func(model, model.emitter, in_out='out', broadening_type="lorentzian")
+    current = current_in - current_out
+    current = current_in
     currents_vs_bias.append(current)
 
 # =========================

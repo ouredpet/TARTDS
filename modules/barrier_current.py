@@ -48,7 +48,7 @@ def current_through_barrier_func(model, barrier_model, in_out = 'in', broadening
     energy_state = model.well.ground_state + model.well.state_shift  # Ground state energy minus the state shift 
 
     # Energy sweep for current calculation
-    energy_vector = np.linspace(0, 1.2 * consts.e_c, 100000)
+    energy_vector = np.linspace(-0.1 * consts.e_c, 0.1 * consts.e_c, 100000) + energy_state
     transparency = transparency_func(energy_vector, barrier_model)
     rate = attempt_rate_func(model, model.well.ground_state)
 
