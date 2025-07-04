@@ -64,7 +64,7 @@ model = Model(emitter, collector, well)
 # Sweep energy_state (in Joules)
 currents, energy_vector, broadening = current_throug_barrier_func(model, model.emitter)
 
-applied_bias_values = np.linspace(0, 0.5, 10)  # Example sweep
+applied_bias_values = np.linspace(-0.5, 0.5, 10)  # Example sweep
 n_2D = 1e12  # Example value
 
 class Result:

@@ -48,7 +48,7 @@ def current_throug_barrier_func(model, barrier_model):
     energy_state = model.well.ground_state + model.well.state_shift  # Ground state energy minus the state shift 
 
     # Energy sweep for current calculation
-    energy_vector = np.linspace(0, 0.3 * consts.e_c, 5000)
+    energy_vector = np.linspace(0, 0.01 * consts.e_c, 50000)
     transparency = transparency_func(energy_vector, barrier_model)
     rate = attempt_rate_func(model, energy_state)
 
@@ -75,6 +75,6 @@ def current_throug_barrier_func(model, barrier_model):
     # Current calculation
     current = n_available * rate * transparency * broadening
     # current = np.trapz(n_available * rate * transparency * broadening, energy_vector)
-    return current, energy_vector, broadening
+    return current, energy_vector, transparency
 
 
