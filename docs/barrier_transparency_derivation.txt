@@ -1,0 +1,79 @@
+# Quantum Mechanical Transmission Through a Rectangular Barrier (Wave Matching)
+
+## 1. Define Regions
+
+- Region I (x < 0): Potential V1, effective mass m1  
+- Region II (0 ≤ x ≤ a): Potential V2, effective mass m2  
+- Region III (x > a): Potential V3, effective mass m3  
+
+---
+
+## 2. Schrödinger Equation in Each Region
+
+Time-independent Schrödinger equation:
+    [ -ħ^2/(2m_i) d^2/dx^2 + V_i ] ψ_i(x) = E ψ_i(x)
+
+---
+
+## 3. General Solutions
+
+- Region I:     ψ1(x) = A1 exp(i k1 x) + B1 exp(-i k1 x)
+- Region II:    ψ2(x) = A2 exp(i k2 x) + B2 exp(-i k2 x)
+- Region III:   ψ3(x) = A3 exp(i k3 x)
+
+where:
+    k1 = sqrt(2 m1 (E - V1)) / ħ  
+    k2 = sqrt(2 m2 (E - V2)) / ħ  
+    k3 = sqrt(2 m3 (E - V3)) / ħ  
+
+---
+
+## 4. Boundary Conditions
+
+Continuity at x = 0 and x = a:
+- Wavefunction:
+      ψ1(0) = ψ2(0)
+      ψ2(a) = ψ3(a)
+- Derivative (BenDaniel-Duke):
+      (1/m1) dψ1/dx |_{x=0} = (1/m2) dψ2/dx |_{x=0}
+      (1/m2) dψ2/dx |_{x=a} = (1/m3) dψ3/dx |_{x=a}
+
+---
+
+## 5. Linear System
+
+At x = 0:
+    A1 + B1 = A2 + B2  
+    (i k1 / m1)(A1 - B1) = (i k2 / m2)(A2 - B2)
+
+At x = a:
+    A2 exp(i k2 a) + B2 exp(-i k2 a) = A3 exp(i k3 a)  
+    (i k2 / m2)[A2 exp(i k2 a) - B2 exp(-i k2 a)] = (i k3 / m3) A3 exp(i k3 a)
+
+---
+
+## 6. Transmission Amplitude and Coefficient
+
+Set A1 = 1 (incident from left), B3 = 0 (no wave from right).  
+Solve for B1, A2, B2, and A3.
+
+Transmission amplitude:
+    t = A3 / A1
+
+Explicit solution:
+    Let  
+      exp_k2a = exp(i k2 a)  
+      exp_mk2a = exp(-i k2 a)  
+      exp_mk1a = exp(-i k1 a)  
+
+    t = [2 k1 k2 m2^2 exp_mk1a] /
+        [ (k1 m2 + k2 m1)(k3 m2 + k2 m3) exp_k2a
+        - (k1 m2 - k2 m1)(k3 m2 - k2 m3) exp_mk2a ]
+
+Transmission coefficient:
+    T = (k3 m1) / (k1 m3) * |t|^2
+
+---
+
+**Summary:**  
+This gives the transparency (transmission probability) for a particle incident from region I, through a barrier of width a, with different potentials and effective masses in each region.

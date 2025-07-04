@@ -1,0 +1,83 @@
+# Quantum Well Density of States and Fermi Distribution
+
+## Fermi Distribution
+
+The Fermi-Dirac distribution:
+    f(E) = 1 / (1 + exp((E - Ef) / (kT)))
+
+---
+
+## Density of States in a Quantum Well (QW)
+
+Wavevector relations:
+    k^2 = kx^2 + ky^2 + kz^2
+    k^2 = 2*m*(E - V) / hbar^2
+    kz^2 = 2*m*(Er - V) / hbar^2
+
+So,
+    2*m*(E - Er) / hbar^2 = kx^2 + ky^2
+
+---
+
+## Particle in a 2D Box
+
+Wavefunction:
+    psi(x, y) = sin(n * pi * x / L) * sin(m * pi * y / L)
+
+Separation of variables:
+    psi(x, y) = X(x) * Y(y)
+
+Schrodinger equation:
+    -hbar^2/(2*m) (d^2/dx^2 + d^2/dy^2) psi = E psi
+
+Eigenvalues:
+    (n * pi / L)^2 = kx^2
+    (m * pi / L)^2 = ky^2
+
+    (n^2 + m^2) * pi^2 / L^2 = 2*m*E / hbar^2
+
+---
+
+## Counting States
+
+Momentum space area for one state:
+    delta_kx = pi / L, delta_ky = pi / L
+    area_per_state = (pi / L)^2
+
+Total area in k-space (for energy E):
+    area = pi * kr^2 = pi * 2*m*E / hbar^2
+
+Only positive kx, ky (first quadrant):
+    area_q = (1/4) * area
+
+Number of states (including spin):
+    num_states = 2 * area_q / area_per_state
+               = 2 * (1/4) * pi * 2*m*E / hbar^2 / (pi / L)^2
+
+Number of states per energy per area:
+    g_2d = m / (pi * hbar^2),   for E >= Er
+
+---
+
+## Electron Density in a Fermi Distribution
+
+Electron density:
+    n_e = integral_{Er}^inf [m / (pi * hbar^2)] * f(E) dE
+
+Substitute f(E):
+    n_e = (m / (pi * hbar^2)) * integral_{Er}^inf [1 / (1 + exp((E - Ef) / (kT)))] dE
+
+Change of variables:
+    let kappa = 1 + exp(-(E - Ef) / (kT))
+    dkappa/dE = -1 / (kT) * exp(-(E - Ef) / (kT))
+
+    n_e = (m / (pi * hbar^2)) * kT * ln(1 + exp((Ef - Er) / (kT)))
+
+---
+
+**Summary:**
+
+- 2D density of states: g_2d = m / (pi * hbar^2)
+- Fermi-Dirac distribution: f(E) = 1 / (1 + exp((E - Ef) / (kT)))
+- Electron density in QW:
+      n_e = (m / (pi * hbar^2)) * kT * ln(1 + exp((Ef - Er) / (kT)))
