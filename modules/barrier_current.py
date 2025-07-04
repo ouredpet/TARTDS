@@ -50,7 +50,7 @@ def current_through_barrier_func(model, barrier_model, in_out = 'in', broadening
     # Energy sweep for current calculation
     energy_vector = np.linspace(0, 0.3 * consts.e_c, 50000)
     transparency = transparency_func(energy_vector, barrier_model)
-    rate = attempt_rate_func(model, energy_state)
+    rate = attempt_rate_func(model, model.well.ground_state)
 
     # Broadening
     gamma = 0.0001 * consts.e_c
@@ -68,7 +68,7 @@ def current_through_barrier_func(model, barrier_model, in_out = 'in', broadening
     broadening /= split
 
     # 2D density of states and Fermi-Dirac occupation
-    m_eff = 0.041 * model.emitter.reg_1.effective_mass
+    m_eff = model.emitter.reg_1.effective_mass
     fermi = model.emitter.fermi_level
     T = model.temperature
     if in_out == 'in':
@@ -82,7 +82,7 @@ def current_through_barrier_func(model, barrier_model, in_out = 'in', broadening
 
     # Current calculation
     d_current = n_available * rate * transparency * broadening
-    current = np.trapz(d_current, energy_vector)
-    return d_current, energy_vector
+    current = consts.e_c * np.trapz(d_current, energy_vector)
+    return current, energy_vector
 
 
