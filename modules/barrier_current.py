@@ -26,7 +26,7 @@ def attempt_rate_func(model, energy_state):
     rate = velocity / (2 * model.well.width)
     return rate
 
-def current_throug_barrier_func(model, barrier_model, energy_state):
+def current_throug_barrier_func(model, barrier_model):
     """
     Calculate the current through a quantum barrier for a given energy state.
 
@@ -44,6 +44,9 @@ def current_throug_barrier_func(model, barrier_model, energy_state):
     tuple
         (current, energy_vector, broadening)
     """
+
+    energy_state = model.well.ground_state + model.well.state_shift  # Ground state energy minus the state shift 
+
     # Energy sweep for current calculation
     energy_vector = np.linspace(0, 0.3 * consts.e_c, 5000)
     transparency = transparency_func(energy_vector, barrier_model)
@@ -55,7 +58,7 @@ def current_throug_barrier_func(model, barrier_model, energy_state):
     dE = 0.001 * consts.e_c
     broadening = np.zeros_like(energy_vector)
     for i in range(split):
-        shift = dE * i - dE * (split / 2 - 0.5)
+        shift = dE * i - 1/2 * dE * (split - 1)
         broadening += (gamma / np.pi) / ((energy_vector - energy_state + shift) ** 2 + gamma ** 2)
     broadening /= split
 

@@ -28,6 +28,9 @@ class Collector:
 class Well:
     def __init__(self, effective_mass, width):
         self.effective_mass = effective_mass
+        self.ground_state = 0.1 * consts.e_c  # Example value
+        self.excited_state = 0.6 * consts.e_c  # Example value
+        self.state_shift = 0.0 * consts.e_c  # Example value
         self.width = width
 
 class Model:
@@ -59,8 +62,7 @@ well = Well(effective_mass=consts.m0, width=10e-9)
 model = Model(emitter, collector, well)
 
 # Sweep energy_state (in Joules)
-energy_states = 0.1 * consts.e_c
-currents, energy_vector, broadening = current_throug_barrier_func(model, model.emitter, energy_states)
+currents, energy_vector, broadening = current_throug_barrier_func(model, model.emitter)
 
 applied_bias_values = np.linspace(0, 0.5, 10)  # Example sweep
 n_2D = 1e12  # Example value
@@ -79,9 +81,10 @@ for applied_bias in applied_bias_values:
     em_reg1.potential_energy = potentials["em_reg1"]
     em_barrier.potential_energy = potentials["em_barrier"]
     well_region.potential_energy = potentials["well_region"]
+    well.state_shift = potentials["state_shift"] 
     col_barrier.potential_energy = potentials["col_barrier"]
     col_reg3.potential_energy = potentials["col_reg3"]
-    currents, energy_vector, broadening = current_throug_barrier_func(model, model.emitter, energy_states)
+    currents, energy_vector, broadening = current_throug_barrier_func(model, model.emitter)
     results.append(Result(applied_bias, energy_vector, currents, broadening))
 
 # Plot all results for current
