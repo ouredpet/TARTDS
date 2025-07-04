@@ -5,6 +5,26 @@ from modules.barrier_transparency import transparency_vectorized
 from physical_constants import PhysicalConstants as consts
 from modules.bias import bias_calc
 
+# =========================
+# Adjustable Parameters
+# =========================
+EFFECTIVE_MASS = 0.041 * consts.m0
+WELL_WIDTH = 3e-9
+BARRIER_WIDTH = 1e-9
+FERMI_LEVEL_EMITTER = (0.15 + 0.1) * consts.e_c
+FERMI_LEVEL_COLLECTOR = 0.1 * consts.e_c
+GROUND_STATE = 0.3 * consts.e_c
+EXCITED_STATE = 0.6 * consts.e_c
+STATE_SHIFT = 0.0 * consts.e_c
+N_2D = 1e15
+TEMPERATURE = 300
+APPLIED_BIAS_START = 0.0
+APPLIED_BIAS_STOP = 3.0
+APPLIED_BIAS_POINTS = 100
+
+# =========================
+# Classes
+# =========================
 class Region:
     def __init__(self, effective_mass, potential_energy, width):
         self.effective_mass = effective_mass
@@ -28,65 +48,65 @@ class Collector:
 class Well:
     def __init__(self, effective_mass, width, n_2D):
         self.effective_mass = effective_mass
-        self.ground_state = 0.1 * consts.e_c  # Example value
-        self.excited_state = 0.6 * consts.e_c  # Example value
-        self.state_shift = 0.0 * consts.e_c  # Example value
+        self.ground_state = GROUND_STATE
+        self.excited_state = EXCITED_STATE
+        self.state_shift = STATE_SHIFT
         self.width = width
         self.n_2D = n_2D
 
 class Model:
-    temperature = 300  # Default temperature in Kelvin
+    temperature = TEMPERATURE  # Default temperature in Kelvin
     def __init__(self, emitter, collector, well):
         self.emitter = emitter
         self.collector = collector
         self.well = well
 
-# Initial bias values for region potentials
-applied_bias = 0
-n_2D = 1e16  # Example value
-init_potentials = bias_calc(applied_bias, n_2D)
+# =========================
+# Setup
+# =========================
+applied_bias = APPLIED_BIAS_START
+init_potentials = bias_calc(applied_bias, N_2D)
 
-# Define regions using initial potentials
-em_reg1 = Region(effective_mass=0.041 * consts.m0, potential_energy=init_potentials["em_reg1"], width=0)
-em_barrier = Region(effective_mass=0.041 * consts.m0, potential_energy=init_potentials["em_barrier"], width=5e-9)
-well_region = Region(effective_mass= 0.041 * consts.m0, potential_energy=init_potentials["well_region"], width=0)  # Shared region
+em_reg1 = Region(EFFECTIVE_MASS, init_potentials["em_reg1"], 0)
+em_barrier = Region(EFFECTIVE_MASS, init_potentials["em_barrier"], BARRIER_WIDTH)
+well_region = Region(EFFECTIVE_MASS, init_potentials["well_region"], 0)  # Shared region
 
-emitter = Emitter(em_reg1, em_barrier, well_region, fermi_level=0.1*consts.e_c)
+emitter = Emitter(em_reg1, em_barrier, well_region, FERMI_LEVEL_EMITTER)
 
 col_reg1 = well_region  # Shared region
-col_barrier = Region(effective_mass=0.041 * consts.m0, potential_energy=init_potentials["col_barrier"], width=5e-9)
-col_reg3 = Region(effective_mass=0.041 * consts.m0, potential_energy=init_potentials["col_reg3"], width=0)
+col_barrier = Region(EFFECTIVE_MASS, init_potentials["col_barrier"], BARRIER_WIDTH)
+col_reg3 = Region(EFFECTIVE_MASS, init_potentials["col_reg3"], 0)
 
-collector = Collector(col_reg1, col_barrier, col_reg3, fermi_level=0.1*consts.e_c)
+collector = Collector(col_reg1, col_barrier, col_reg3, FERMI_LEVEL_COLLECTOR)
 
-well = Well(effective_mass=0.041 * consts.m0, width=10e-9, n_2D=n_2D)
+well = Well(EFFECTIVE_MASS, WELL_WIDTH, N_2D)
 model = Model(emitter, collector, well)
 
-# Sweep energy_state (in Joules)
-currents, energy_vector = current_through_barrier_func(model, model.emitter, in_out='in')
-
-applied_bias_values = np.linspace(-0.5, 0.5, 10)  # Example sweep
-
+# =========================
+# Simulation
+# =========================
+applied_bias_values = np.linspace(APPLIED_BIAS_START, APPLIED_BIAS_STOP, APPLIED_BIAS_POINTS)
 currents_vs_bias = []
 
 for applied_bias in applied_bias_values:
-    potentials = bias_calc(applied_bias, n_2D)
+    potentials = bias_calc(applied_bias, N_2D)
     em_reg1.potential_energy = potentials["em_reg1"]
     em_barrier.potential_energy = potentials["em_barrier"]
     well_region.potential_energy = potentials["well_region"]
     well.state_shift = potentials["state_shift"] 
     col_barrier.potential_energy = potentials["col_barrier"]
     col_reg3.potential_energy = potentials["col_reg3"]
-    current, energy_vector = current_through_barrier_func(model, model.emitter, in_out='in', broadening_type="gaussian")
+    current, energy_vector = current_through_barrier_func(model, model.emitter, in_out='in', broadening_type="lorentzian")
     currents_vs_bias.append(current)
 
-print(currents_vs_bias)
-# Plot current vs applied bias
+# =========================
+# Plot
+# =========================
+currents_vs_bias = np.array(currents_vs_bias)
 fig, ax = plt.subplots(figsize=(6, 4))
-ax.plot(applied_bias_values, currents_vs_bias, marker='o')
+ax.plot(applied_bias_values, currents_vs_bias * 1e3 / 1e12, marker='o')
 ax.set_xlabel('Applied Bias (V)')
 ax.set_ylabel('Current (arb. units)')
 ax.set_title('Current Through Barrier vs Applied Bias')
-ax.set_yscale('log')
 ax.grid(True)
 plt.show()
