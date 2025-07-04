@@ -8,7 +8,7 @@ def bias_calc(applied_bias, n_2D):
     return {
         "em_reg1": 0,
         "em_barrier": 0.3 * consts.e_c,
-        "well_region": 0,
+        "well_region": -applied_bias/10 * consts.e_c,  # Example calculation
         "col_barrier": 0.3 * consts.e_c,
         "col_reg3": 0,
     }
