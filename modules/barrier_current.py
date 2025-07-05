@@ -23,7 +23,7 @@ def attempt_rate_func(model, energy_state):
     float
         The estimated collision rate with one wall (in 1/s).
     """
-    m_eff = non_parabolic_mass(model.well.effective_mass, energy_state, model.well.reg_1.potential_energy, model.emitter.reg_1.band_gap_energy)
+    m_eff = non_parabolic_mass(model.well.effective_mass, energy_state, 0, model.well.band_gap_energy)
     velocity = np.sqrt(2 * energy_state / m_eff)
     rate = velocity / (2 * model.well.width)
     return rate
