@@ -15,8 +15,9 @@ def transparency_vectorized(energy_vec, model):
     width = model.barrier.width
 
     # print(f"Effective masses: m1={m1}, m2={m2}, m3={m3}")
-    # print(f"Potential energies: v1={v1}, v2={v2}, v3={v3}")
+    # print(f"Potential energies: v1={v1/consts.e_c}, v2={v2/consts.e_c}, v3={v3/consts.e_c}")
     # print(f"Barrier width: {width}")
+    # print(energy_vec / consts.e_c)
 
     k1 = calc_k(m1, v1, energy_vec)
     k2 = calc_k(m2, v2, energy_vec)
