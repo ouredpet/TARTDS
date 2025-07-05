@@ -13,11 +13,11 @@ EFFECTIVE_MASS_ALAS = 0.15 * consts.m0
 WELL_WIDTH = 3.6e-9
 BARRIER_WIDTH = 1.1e-9
 FERMI_LEVEL_EMITTER = (0.16 + 0.1) * consts.e_c
-FERMI_LEVEL_COLLECTOR = 0.1 * consts.e_c
+FERMI_LEVEL_COLLECTOR = 0.16 * consts.e_c
 GROUND_STATE = 0.28 * consts.e_c
 EXCITED_STATE = 0.6 * consts.e_c
 STATE_SHIFT = 0.0 * consts.e_c
-N_2D = 0.5e16
+N_2D = 1.0e16
 TEMPERATURE = 300
 APPLIED_BIAS_START = 0.0
 APPLIED_BIAS_STOP = 3.0
@@ -131,8 +131,8 @@ for applied_bias in applied_bias_values:
     col_reg3.potential_energy = potentials["col_reg3"]
     current_in, energy_vector = current_through_barrier_func(model, model.emitter, in_out='in', broadening_type="lorentzian")
     current_out, energy_vector = current_through_barrier_func(model, model.emitter, in_out='out', broadening_type="lorentzian")
-    # current = current_in - current_out
-    current = current_in 
+    current = current_in - current_out
+    # current = current_in 
     col_current_out, energy_vector = current_through_barrier_func(model, model.collector, in_out='out', broadening_type="lorentzian")
     currents_vs_bias.append(current)
     col_currents_vs_bias.append(col_current_out)
