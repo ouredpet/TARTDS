@@ -1,14 +1,15 @@
 import numpy as np
 from physical_constants import PhysicalConstants as consts
+from modules.non_parabolic_mass import non_parabolic_mass
 
 def calc_k(mass, potential, energy):
     return np.sqrt(2 * mass * (energy - potential) / consts.hbar**2)
 
 def transparency_vectorized(energy_vec, model):
     energy_vec = energy_vec.astype(complex)
-    m1 = model.reg_1.effective_mass
-    m2 = model.barrier.effective_mass
-    m3 = model.reg_3.effective_mass
+    m1 = non_parabolic_mass(model.reg_1.effective_mass, energy_vec, model.reg_1.potential_energy, model.reg_1.band_gap_energy)
+    m2 = non_parabolic_mass(model.barrier.effective_mass, energy_vec, model.barrier.potential_energy, model.barrier.band_gap_energy)
+    m3 = non_parabolic_mass(model.reg_3.effective_mass, energy_vec, model.reg_3.potential_energy, model.reg_3.band_gap_energy)
     v1 = model.reg_1.potential_energy
     v2 = model.barrier.potential_energy
     v3 = model.reg_3.potential_energy

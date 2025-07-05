@@ -1,6 +1,7 @@
 import numpy as np
 from physical_constants import PhysicalConstants as consts
 from modules.barrier_transparency import transparency_vectorized as transparency_func
+from modules.non_parabolic_mass import non_parabolic_mass
 
 def attempt_rate_func(model, energy_state):
     """
@@ -68,7 +69,7 @@ def current_through_barrier_func(model, barrier_model, in_out = 'in', broadening
     broadening /= split
 
     # 2D density of states and Fermi-Dirac occupation
-    m_eff = model.emitter.reg_1.effective_mass
+    m_eff = non_parabolic_mass(model.emitter.reg_1.effective_mass, energy_vector, model.emitter.reg_1.potential_energy, model.emitter.reg_1.band_gap_energy)
     fermi = model.emitter.fermi_level
     T = model.temperature
     if in_out == 'in':

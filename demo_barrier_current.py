@@ -8,10 +8,11 @@ from modules.bias import bias_calc
 # =========================
 # Adjustable Parameters
 # =========================
-EFFECTIVE_MASS = 0.041 * consts.m0
+EFFECTIVE_MASS_INGAAS = 0.041 * consts.m0
+EFFECTIVE_MASS_ALAS = 0.15 * consts.m0
 WELL_WIDTH = 3.6e-9
 BARRIER_WIDTH = 1.1e-9
-FERMI_LEVEL_EMITTER = (0.16 + 0.1) * consts.e_c # here +0.1 because of the emitter step, it is also hidden in the bias calculations
+FERMI_LEVEL_EMITTER = (0.16 + 0.1) * consts.e_c
 FERMI_LEVEL_COLLECTOR = 0.1 * consts.e_c
 GROUND_STATE = 0.28 * consts.e_c
 EXCITED_STATE = 0.6 * consts.e_c
@@ -22,14 +23,20 @@ APPLIED_BIAS_START = 0.0
 APPLIED_BIAS_STOP = 3.0
 APPLIED_BIAS_POINTS = 100
 
+# Bandgap energies (in eV)
+BANDGAP_INGAAS = 0.74      # In0.53Ga0.47As, lattice-matched to InP
+BANDGAP_ALINGAAS = 0.84
+BANDGAP_ALAS = 2.16        # Bulk AlAs, indirect gap
+
 # =========================
 # Classes
 # =========================
 class Region:
-    def __init__(self, effective_mass, potential_energy, width):
+    def __init__(self, effective_mass, potential_energy, width, band_gap_energy):
         self.effective_mass = effective_mass
         self.potential_energy = potential_energy
         self.width = width
+        self.band_gap_energy = band_gap_energy
 
 class Emitter:
     def __init__(self, reg_1, barrier, reg_3, fermi_level):
@@ -67,19 +74,44 @@ class Model:
 applied_bias = APPLIED_BIAS_START
 init_potentials = bias_calc(applied_bias, N_2D)
 
-em_reg1 = Region(EFFECTIVE_MASS, init_potentials["em_reg1"], 0)
-em_barrier = Region(EFFECTIVE_MASS, init_potentials["em_barrier"], BARRIER_WIDTH)
-well_region = Region(EFFECTIVE_MASS, init_potentials["well_region"], 0)  # Shared region
+em_reg1 = Region(
+    EFFECTIVE_MASS_INGAAS,
+    init_potentials["em_reg1"],
+    0,
+    band_gap_energy=BANDGAP_ALINGAAS * consts.e_c 
+)
+em_barrier = Region(
+    EFFECTIVE_MASS_ALAS,
+    init_potentials["em_barrier"],
+    BARRIER_WIDTH,
+    band_gap_energy=BANDGAP_ALAS * consts.e_c
+)
+well_region = Region(
+    EFFECTIVE_MASS_INGAAS,
+    init_potentials["well_region"],
+    0,
+    band_gap_energy=BANDGAP_INGAAS * consts.e_c
+)
 
 emitter = Emitter(em_reg1, em_barrier, well_region, FERMI_LEVEL_EMITTER)
 
 col_reg1 = well_region  # Shared region
-col_barrier = Region(EFFECTIVE_MASS, init_potentials["col_barrier"], BARRIER_WIDTH)
-col_reg3 = Region(EFFECTIVE_MASS, init_potentials["col_reg3"], 0)
+col_barrier = Region(
+    EFFECTIVE_MASS_ALAS,
+    init_potentials["col_barrier"],
+    BARRIER_WIDTH,
+    band_gap_energy=BANDGAP_ALAS * consts.e_c
+)
+col_reg3 = Region(
+    EFFECTIVE_MASS_INGAAS,
+    init_potentials["col_reg3"],
+    0,
+    band_gap_energy=BANDGAP_INGAAS * consts.e_c
+)
 
 collector = Collector(col_reg1, col_barrier, col_reg3, FERMI_LEVEL_COLLECTOR)
 
-well = Well(EFFECTIVE_MASS, WELL_WIDTH, N_2D)
+well = Well(EFFECTIVE_MASS_INGAAS, WELL_WIDTH, N_2D)
 model = Model(emitter, collector, well)
 
 # =========================
