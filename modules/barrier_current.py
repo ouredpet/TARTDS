@@ -23,7 +23,8 @@ def attempt_rate_func(model, energy_state):
     float
         The estimated collision rate with one wall (in 1/s).
     """
-    velocity = np.sqrt(2 * energy_state / model.well.effective_mass)
+    m_eff = non_parabolic_mass(model.well.effective_mass, energy_state, model.well.reg_1.potential_energy, model.emitter.reg_1.band_gap_energy)
+    velocity = np.sqrt(2 * energy_state / m_eff)
     rate = velocity / (2 * model.well.width)
     return rate
 
@@ -55,7 +56,7 @@ def current_through_barrier_func(model, barrier_model, in_out = 'in', broadening
 
     # Broadening
     gamma = 0.00001 * consts.e_c
-    split = 1
+    split = 3
     dE = 0.0001 * consts.e_c
     broadening = np.zeros_like(energy_vector)
     for i in range(split):

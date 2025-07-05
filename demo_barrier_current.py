@@ -9,12 +9,12 @@ from modules.bias import bias_calc
 # Adjustable Parameters
 # =========================
 EFFECTIVE_MASS_INGAAS = 0.041 * consts.m0
-EFFECTIVE_MASS_ALAS = 0.15 * consts.m0
+EFFECTIVE_MASS_ALAS = 0.12 * consts.m0
 WELL_WIDTH = 3.6e-9
-BARRIER_WIDTH = 1.1e-9
+BARRIER_WIDTH = 1.4e-9
 FERMI_LEVEL_EMITTER = (0.16 + 0.1) * consts.e_c
 FERMI_LEVEL_COLLECTOR = 0.16 * consts.e_c
-GROUND_STATE = 0.28 * consts.e_c
+GROUND_STATE = 0.25 * consts.e_c
 EXCITED_STATE = 0.6 * consts.e_c
 STATE_SHIFT = 0.0 * consts.e_c
 N_2D = 1.0e16
@@ -53,13 +53,14 @@ class Collector:
         self.fermi_level = fermi_level
 
 class Well:
-    def __init__(self, effective_mass, width, n_2D):
+    def __init__(self, effective_mass, width, n_2D, band_gap_energy):
         self.effective_mass = effective_mass
         self.ground_state = GROUND_STATE
         self.excited_state = EXCITED_STATE
         self.state_shift = STATE_SHIFT
         self.width = width
         self.n_2D = n_2D
+        self.band_gap_energy = band_gap_energy
 
 class Model:
     temperature = TEMPERATURE  # Default temperature in Kelvin
@@ -111,7 +112,7 @@ col_reg3 = Region(
 
 collector = Collector(col_reg1, col_barrier, col_reg3, FERMI_LEVEL_COLLECTOR)
 
-well = Well(EFFECTIVE_MASS_INGAAS, WELL_WIDTH, N_2D)
+well = Well(EFFECTIVE_MASS_INGAAS, WELL_WIDTH, N_2D, BANDGAP_INGAAS * consts.e_c)
 model = Model(emitter, collector, well)
 
 # =========================
